@@ -1,0 +1,91 @@
+\documentclass[12pt]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+ 
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Re-expressing RBF }
+\author{Author}
+\maketitle
+ 
+\begin{proof}
+Hypothesis with movable centers: 
+$$f(x) = \sum_k c_k e^{ -\| x - w_k\|^2 }$$
+
+let $\tilde{x}_k = \| x - w_k\| \geq 0 $. Thus, notice:
+
+ $$ e^{ - \tilde{x}_k ^2 } \approx \tilde{t}( \tilde{x}_k) = max(0, 1 - \tilde{x}_k) $$
+ 
+ Hence:
+ 
+ $$ f(x) = \sum_k c_k e^{ -\tilde{x}_k^2 } \approx \sum_k c_k \tilde{t}( \tilde{x} ) $$
+ 
+ Notice the following two relations:
+ 
+ $$ \tilde{x}^2_k = \| x - w_k\|^2 = 2(1 - \langle x, w_k \rangle )$$
+ 
+and:
+
+$$ \tilde{t}(x) = | \tilde{x}_k - 1 |_+ - | \tilde{x}_k |_+ + 1$$
+
+where $|z|_+ = max(0, z)$. Hence:
+
+$$f(x) \approx  \sum_k c_k \tilde{t}( \tilde{x} ) = \sum_k c_k (| \tilde{x}_k - 1 |_+ - | \tilde{x}_k |_+ + 1)$$
+
+Notice $\tilde{x} \geq 0 \implies | \tilde{x} |_+ = \tilde{x}$. 
+
+$$f(x) \approx  \sum_k c_k \tilde{t}( \tilde{x} ) = \sum_k c_k | \tilde{x}_k - 1 |_+ - \sum_k c_k \tilde{x}_k  + \sum_k c_k$$
+
+Lets analyze 
+
+\begin{equation}
+\label{interesting_rectifier}
+\sum_k c_k | \tilde{x}_k - 1 |_+
+\end{equation}
+
+in more detail:
+
+Notice $| \tilde{x}_k - 1 |_+ =  | \sqrt{2} \sqrt{1 - \langle x, w_k \rangle} - 1 |_+ = \sqrt{2} | \sqrt{1 - \langle x, w_k \rangle} - \frac{\sqrt{2}}{2}|_+$
+
+Let $\langle x, w_k \rangle = cos(\theta_k)$ where $\theta_k = \angle(x, w_k) $ is the angle between $x$ and $w_k$ (normalized) vectors.
+
+Hence we have:
+
+$$| \tilde{x}_k - 1 |_+ =  \sqrt{2} | \sqrt{ 1 - cos(\theta_k)} - \frac{ \sqrt{2} }{2}   |_+$$
+
+Notice that the above function $| \sqrt{ 1 - cos(\theta_k)} - \frac{ \sqrt{2} }{2}   |_+ $ is periodic. So we can get its Fourier approximation:
+
+\begin{equation}
+\label{fourier_eq}
+| \sqrt{ 1 - cos(\theta_k)} - \frac{ \sqrt{2} }{2}   |_+ \approx a_0 +  \sum_n a_n cos(n \theta_k)
+\end{equation}
+
+Now lets try to express the above in terms of only inner products $\langle x, w_k \rangle$ (or equivalently, as a function of $cos(\theta_k)$). It can be shown that:
+
+$$ cos(n \theta_k)  = \frac{1}{2} \left( \left( cos(\theta_k) + \sqrt{cos^2(\theta_k) -1} \right)^n + \left( cos(\theta_k) - \sqrt{cos^2(\theta_k) - 1} \right)^n  \right) $$
+
+Hence, makes Fourier approximation \eqref{fourier_eq} become:
+
+$$ | \sqrt{ 1 - cos(\theta_k)} - \frac{ \sqrt{2} }{2}   |_+ \approx \sum_n a_n \frac{1}{2} \left( \left( \langle x, w_k \rangle + \sqrt{\langle x, w_k \rangle^2 -1} \right)^n + \left( \langle x, w_k \rangle - \sqrt{\langle x, w_k \rangle^2 - 1} \right)^n  \right) $$
+
+this makes the final equation \eqref{interesting_rectifier} look as follows:
+
+$$ f(x) \approx \sum_k c_k | \tilde{x}_k - 1 |_+ \approx  \sum_{n,k} c_k a_n \frac{1}{2} \left( \left( \langle x, w_k \rangle + \sqrt{\langle x, w_k \rangle^2 -1} \right)^n + \left( \langle x, w_k \rangle - \sqrt{\langle x, w_k \rangle^2 - 1} \right)^n  \right)$$
+
+
+\end{proof}
+
+\end{document}
